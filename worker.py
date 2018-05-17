@@ -1,8 +1,6 @@
 import time
 from PyQt5.QtCore import pyqtSignal, QThread, QObject
-import screen
-import formatter
-from bot import VindictBot, ProtectionBot
+from bot.paladin.priority import VindictBot
 
 
 class WorkerSignals(QObject):
@@ -19,19 +17,17 @@ class Worker(QThread):
         super().__init__()
         self.signals = WorkerSignals()
         self.running = False
-        #self.bot = ProtectionBot()
+        #self.priority = ProtectionBot()
         self.bot = VindictBot()
 
     def run(self):
         self.running = True
 
+
         while self.running:
             time.sleep(Worker.interval)
-            data = screen.get_data()
 
-            self.signals.ui.emit(formatter.paladin(data))
-
-            p_spell = self.bot.react(data)
+            p_spell = self.bot.process()
 
             if p_spell is not None:
                 log = '{}'.format(p_spell['label'])

@@ -5,7 +5,6 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QPushButton, QVBoxLayout, QWidget, QLabel, QHBoxLayout, QCheckBox, \
     QDoubleSpinBox, QTextEdit, QTabWidget, QTableWidget, QTableWidgetItem
 
-from bot import Bot
 from worker import Worker
 
 import keyboard
@@ -28,10 +27,6 @@ class BotWidget(QWidget):
         # UI state
         self.ui_state = QLabel()
 
-        # Switch
-        self.switch = QCheckBox()
-        self.switch.setText('Attack neutral')
-
         # Thread speed
         self.speed = QDoubleSpinBox()
         self.speed.setMinimum(0.1)
@@ -52,7 +47,6 @@ class BotWidget(QWidget):
         self.btn_stop.setDisabled(True)
 
         options_hbox = QHBoxLayout()
-        options_hbox.addWidget(self.switch)
         options_hbox.addWidget(self.speed)
 
         btns_hbox = QHBoxLayout()
@@ -70,9 +64,6 @@ class BotWidget(QWidget):
 
     def setUiState(self, txt):
         self.ui_state.setText(txt)
-
-    def onSwitchToggle(self, action):
-        self.switch.toggled.connect(action)
 
     def onSpeedChange(self, action):
         self.speed.valueChanged.connect(action)
@@ -131,16 +122,14 @@ class App(QWidget):
 
         keyboard.add_hotkey('²', self.start_worker)
 
-        self.setWindowTitle("Wow bot")
+        self.setWindowTitle("Wow priority")
         self.setWindowIcon(QIcon('./assets/wow_icon.png'))
 
-        # Tabs
         self.bot_widget = BotWidget()
         self.config_widget = ConfigWidget()
         self.log_widget = LogWidget()
 
         self.bot_widget.onSpeedChange(self.change_worker_interval)
-        self.bot_widget.onSwitchToggle(self.toggle_neutral)
         self.bot_widget.onStartClick(self.start_worker)
         self.bot_widget.onStopClick(self.stop_worker)
 
@@ -165,7 +154,7 @@ class App(QWidget):
         if self.screenWorker:
             return
 
-        self.bot_widget.setUiState('Starting bot')
+        self.bot_widget.setUiState('Starting priority')
         self.bot_widget.btn_start.setDisabled(True)
         self.bot_widget.btn_stop.setEnabled(True)
 
@@ -210,10 +199,6 @@ class App(QWidget):
     @staticmethod
     def change_worker_interval(interval):
         Worker.interval = interval
-
-    @staticmethod
-    def toggle_neutral():
-        Bot.attack_neutral = not Bot.attack_neutral
 
     def closeEvent(self, event):
         self.stop_worker()
